@@ -29,12 +29,15 @@ All reconstruction in this test was done **virtually and read-only**. Nothing wa
 The original test array was a standard two-disk RAID1. The screenshots below show the disks selected for the initial array and the migration being prepared.
 
 ![Initial RAID1 drive selection](images/synology-ds409-raid1-select-hard-drives.png)
+
 *Initial two-disk RAID1 configuration in Synology DSM.*
 
 ![Adding a third drive for migration](images/synology-ds409-start-raid1-to-raid5-migration.png)
+
 *The third disk was added in preparation for changing the array from RAID1 to RAID5.*
 
 ![Confirming RAID migration](images/synology-ds409-confirm-raid-migration.png)
+
 *DSM confirmation dialog for the RAID1 to RAID5 migration.*
 
 ## Failure scenario
@@ -42,6 +45,7 @@ The original test array was a standard two-disk RAID1. The screenshots below sho
 We started the migration and intentionally interrupted it with a hard power cut when DSM reported **29.55%** progress.
 
 ![Migration progress at 29.55%](images/synology-ds409-raid-migration-progress.png)
+
 *The reshape was interrupted at 29.55% without a graceful shutdown.*
 
 After that, we simulated the complete loss of **one original RAID1 disk**. The only surviving members available for analysis were:
@@ -58,6 +62,7 @@ At that point, there was no intact original mirror anymore. The surviving disks 
 After connecting the two surviving disks to a Windows workstation, Hetman RAID Recovery automatically detected the current main data array as a **three-member RAID5 with one missing member**.
 
 ![Automatically detected Synology RAID5](images/hetman-raid-recovery-detect-synology-raid5-array.png)
+
 *The software automatically detected the main Synology data array as a degraded RAID5.*
 
 The detected properties were:
@@ -72,11 +77,13 @@ The detected properties were:
 | Filesystem | Ext4 |
 
 ![RAID5 properties](images/hetman-raid-recovery-raid5-array-properties.png)
+
 *Detected RAID5 properties, including layout, chunk size and offset.*
 
 The software also detected the small Synology system/service RAID1 structures separately. This is important because those arrays should not be mistaken for the user-data volume.
 
 ![System RAID1 arrays](images/hetman-raid-recovery-synology-system-raid1-arrays.png)
+
 *The small Synology service partitions were detected separately from the main user-data array.*
 
 ## Scanning the automatically detected RAID5
@@ -84,6 +91,7 @@ The software also detected the small Synology system/service RAID1 structures se
 We ran a **Fast scan** on the detected RAID5 volume.
 
 ![Fast scan on RAID5](images/hetman-raid-recovery-fast-scan-raid5-ext4.png)
+
 *Fast scan of the detected RAID5 volume.*
 
 The scan found:
@@ -94,9 +102,11 @@ The scan found:
 The directory tree was partially available, and part of the original test data could be previewed and copied.
 
 ![Recovered files from RAID5](images/hetman-raid-recovery-raid5-files-and-folders.png)
+
 *Part of the original files and folders were visible on the reconstructed RAID5.*
 
 ![Saving files from RAID5](images/hetman-raid-recovery-save-files-from-raid5.png)
+
 *Copying recoverable files from the automatically detected degraded RAID5.*
 
 However, the result was incomplete. Some of the original files were missing, which suggested that analyzing only the **new RAID5 geometry** was not enough.
@@ -112,24 +122,29 @@ That is why we also examined the disks manually.
 To verify the offsets independently, we checked the disk structure in the hex editor.
 
 ![Open physical disk in hex editor](images/hetman-raid-recovery-open-physical-disk-hex-editor.png)
+
 *Opening a physical Synology member disk in the built-in hex editor.*
 
 The data-member partition began at **LBA 9,437,184**.
 
 ![Partition start offset](images/calculate-synology-raid-partition-start-offset.png)
+
 *The large data partition started at LBA 9,437,184.*
 
 Next, we located the Linux MD superblock signature `A92B4EFC`.
 
 ![Search for MD signature](images/hetman-raid-recovery-search-md-superblock-signature.png)
+
 *Searching for the Linux MD superblock signature.*
 
 ![MD superblock found](images/hetman-raid-recovery-find-diskstation-md-superblock.png)
+
 *The MD superblock was found at the expected location.*
 
 Inside the superblock, the `data_offset` field showed the member-data start relative to the partition beginning.
 
 ![MD superblock data_offset](images/hetman-raid-recovery-md-superblock-data-offset-field.png)
+
 *The MD superblock contained the data_offset field needed for manual reconstruction.*
 
 The resulting data offset for the RAID members was:
@@ -139,6 +154,7 @@ The resulting data offset for the RAID members was:
 ```
 
 ![Calculated data offset in bytes](images/calculate-synology-raid-data-offset-in-bytes.png)
+
 *Calculated absolute data offset for the RAID members.*
 
 ## Manual reconstruction of the new RAID5 layout
@@ -148,9 +164,11 @@ Even though the RAID5 was detected automatically in our case, we also rebuilt it
 We opened **RAID Constructor** and created a degraded three-member RAID5 using the two surviving disks and one **Empty disk** placeholder.
 
 ![Open RAID Constructor](images/hetman-raid-recovery-open-raid-constructor.png)
+
 *Opening RAID Constructor for manual recovery.*
 
 ![Add empty disk to RAID5](images/hetman-raid-recovery-add-empty-disk-to-raid5.png)
+
 *The missing RAID5 member was represented by an Empty disk placeholder.*
 
 The candidate configuration used:
@@ -162,15 +180,19 @@ The candidate configuration used:
 - the calculated data offsets for the surviving members
 
 ![Set RAID5 data offsets](images/hetman-raid-recovery-set-raid5-disk-data-offsets.png)
+
 *The correct member data offsets were set manually.*
 
 ![Detected RAID5 configuration](images/hetman-raid-recovery-detect-raid5-configuration.png)
+
 *Automatic permutation testing returned a plausible RAID5 configuration.*
 
 ![Left synchronous, 64 KB blocks](images/hetman-raid-recovery-left-synchronous-64kb-blocks.png)
+
 *Left Synchronous parity layout with 64 KB blocks.*
 
 ![Add reconstructed RAID5](images/hetman-raid-recovery-add-reconstructed-raid5-array.png)
+
 *The manually reconstructed degraded RAID5 was added to the disk list.*
 
 This confirmed that the current RAID5 geometry itself was not the core problem. The bigger issue was that the reshape had not finished across the entire data area.
@@ -180,17 +202,21 @@ This confirmed that the current RAID5 geometry itself was not the core problem. 
 To check the unconverted region, we reconstructed the **old RAID1** manually using the surviving original mirror member and an **Empty disk** placeholder.
 
 ![Select RAID1 in constructor](images/hetman-raid-recovery-select-raid1-in-constructor.png)
+
 *Selecting RAID1 for manual reconstruction of the earlier array layout.*
 
 ![Set RAID1 data offset](images/hetman-raid-recovery-set-raid1-disk-data-offset.png)
+
 *The same calculated data offset was applied to the RAID1 reconstruction.*
 
 ![Add reconstructed RAID1](images/hetman-raid-recovery-add-reconstructed-raid1-array.png)
+
 *The old RAID1 geometry was reconstructed virtually using one surviving original member and one Empty disk placeholder.*
 
 We then ran **Full analysis** on the Ext4 volume found in that reconstruction.
 
 ![Full analysis on RAID1](images/hetman-raid-recovery-full-analysis-raid1-ext4.png)
+
 *Full analysis of the reconstructed RAID1 volume.*
 
 The scan found:
@@ -199,14 +225,17 @@ The scan found:
 - **14,049 files**
 
 ![RAID1 analysis results](images/hetman-raid-recovery-raid1-analysis-files-and-folders.png)
+
 *The reconstructed RAID1 produced a larger file set than the current RAID5 view.*
 
 This file set was significantly larger than what we saw through the current RAID5 geometry.
 
 ![Browse recovered RAID1 files](images/hetman-raid-recovery-browse-recovered-raid1-files.png)
+
 *Browsing the recovered directory tree from the reconstructed RAID1.*
 
 ![Find files by name](images/hetman-raid-recovery-find-files-by-name.png)
+
 *Recovered files could be checked by name and previewed before export.*
 
 ## Results and interpretation
