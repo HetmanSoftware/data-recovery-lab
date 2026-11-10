@@ -1,5 +1,7 @@
 # Synology DS409 RAID1 to RAID5 migration interrupted at 29.55%: what survived after losing an original disk?
 
+![Synology DS409 RAID1 to RAID5 interrupted migration](images/synology-ds409-raid1-to-raid5-cover.jpg)
+
 We reproduced a specific Synology NAS failure scenario that can be confusing during recovery: a **RAID1 → RAID5 migration** was interrupted by a power loss, and then **one of the two original RAID1 disks was no longer available**. The result was not simply a degraded RAID5. Part of the address space had already been reshaped into the new RAID5 layout, while another part still reflected the earlier RAID1 layout.
 
 The goal of this experiment was not to bring the NAS back online. We wanted to determine:
