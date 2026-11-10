@@ -27,6 +27,10 @@ data-recovery-lab/
 
 - [Synology DS409 RAID1 to RAID5 migration interrupted at 29.55%: what survived after losing an original disk?](experiments/synology-ds409-raid1-to-raid5-migration-failure/README.md)
 
+### VeraCrypt / encrypted storage
+
+- [VeraCrypt file containers, hidden volumes, and deleted encrypted partitions](experiments/veracrypt-containers-hidden-volumes-deleted-partitions/README.md)
+
 ## Planned categories
 
 - Synology NAS

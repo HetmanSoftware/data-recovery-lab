@@ -1,0 +1,214 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="Evidence-based study of VeraCrypt encrypted file containers, standard and hidden USB volumes, and lost partition boundaries, using original experiment screenshots."><meta property="og:type" content="article"><meta property="og:title" content="VeraCrypt Data Recovery — Hetman Software Data Recovery Lab"><meta property="og:description" content="Evidence-based study of VeraCrypt encrypted file containers, standard and hidden USB volumes, and lost partition boundaries, using original experiment screenshots."><meta property="og:image" content="https://raw.githubusercontent.com/HetmanSoftware/data-recovery-lab/main/experiments/veracrypt-containers-hidden-volumes-deleted-partitions/images/veracrypt-data-recovery-cover-en.webp"><link rel="canonical" href="https://hetmansoftware.github.io/data-recovery-lab/experiments/veracrypt-containers-hidden-volumes-deleted-partitions/"><title>VeraCrypt recovery: containers, hidden volumes, deleted partitions | Hetman Data Recovery Lab</title><style>
+    :root{color-scheme:light;--text:#14233b;--muted:#586a83;--accent:#176db8;--border:#dbe5ee;--surface:#f5f8fc}
+    *{box-sizing:border-box}body{margin:0;background:#fff;color:var(--text);font:16px/1.72 ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+    header{border-bottom:1px solid var(--border);background:var(--surface)}
+    nav{max-width:1000px;margin:auto;padding:16px 24px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+    nav strong{font-size:16px}a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+    main{max-width:1000px;padding:32px 24px 84px;margin:auto}
+    h1{font-size:clamp(30px,4vw,44px);line-height:1.18;letter-spacing:-.035em;margin:0 0 30px}
+    h2{font-size:29px;line-height:1.25;margin:56px 0 18px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+    h3{font-size:21px;line-height:1.3;margin:34px 0 12px}p{margin:14px 0}
+    ul,ol{padding-left:30px}li{padding-left:4px;margin:4px 0}
+    figure{margin:24px 0 30px}figure img{display:block;max-width:100%;height:auto;border:1px solid var(--border);border-radius:7px}
+    figcaption{color:var(--muted);font-size:14px;margin-top:9px;line-height:1.5}
+    blockquote{margin:22px 0;padding:12px 16px;border-left:4px solid var(--accent);background:var(--surface)}
+    pre{background:#122035;color:#e9f3ff;padding:16px 20px;border-radius:8px;overflow-x:auto}
+    code{font:.9em ui-monospace,SFMono-Regular,Consolas,monospace;background:#ecf2f8;border-radius:3px;padding:2px 4px}
+    pre code{background:transparent;padding:0}
+    .table-wrap{overflow-x:auto}table{width:100%;border-collapse:collapse;margin:18px 0}
+    th,td{border:1px solid var(--border);text-align:left;padding:9px 12px}th{background:var(--surface)}
+    .video-section{margin:38px 0 56px;padding:26px;background:var(--surface);border-radius:12px;border:1px solid var(--border)}
+    .video-section h2{border:0;margin:0 0 12px;padding:0}
+    .video-container{width:100%;aspect-ratio:16/9;background:#06182c;border-radius:10px;overflow:hidden}
+    .video-container iframe{width:100%;height:100%;border:0;display:block}
+    .video-note{font-size:13px;color:var(--muted)}
+    footer{border-top:1px solid var(--border);padding:28px 24px;text-align:center;color:var(--muted);font-size:13px}
+  </style></head><body><header><nav><strong><a href="https://hetmansoftware.github.io/data-recovery-lab/">Hetman Data Recovery Lab</a></strong><a href="https://github.com/HetmanSoftware/data-recovery-lab/blob/main/experiments/veracrypt-containers-hidden-volumes-deleted-partitions/README.md">Technical report on GitHub</a></nav></header><main><article><h1>VeraCrypt recovery lab: file containers, hidden volumes, and deleted encrypted partitions</h1>
+<figure><p><img src="https://raw.githubusercontent.com/HetmanSoftware/data-recovery-lab/main/experiments/veracrypt-containers-hidden-volumes-deleted-partitions/images/veracrypt-data-recovery-cover-en.webp" alt="VeraCrypt data recovery experiment: file containers, encrypted USB drives, and deleted partitions" /></p>
+<p><strong>Lab:</strong> Hetman Software Data Recovery Lab<br />
+<strong>Experiment date:</strong> Not recorded in the source script<br />
+<strong>Scenario:</strong> <code>veracrypt-containers-hidden-volumes-deleted-partitions</code><br />
+<strong>Demonstration video:</strong> https://www.youtube.com/watch?v=NlgMI807V2I</p>
+<h2>Research question and scope</h2>
+<p>This case study examines whether previously stored and deleted files remain discoverable after an existing VeraCrypt file container, standard encrypted USB volume or hidden VeraCrypt volume is unlocked in a filesystem recovery tool. It also examines how to analyze encrypted volumes when their partition-table entries have been removed.</p>
+<p>The source is a Ukrainian test script containing application screenshots. The evidence shows successful unlock operations, identified filesystems and file entries in the analysis interface. <strong>It does not record the number of files exported to another device, independent integrity checks, password recovery, or tests of each supported cipher.</strong> We therefore separate those outcomes below.</p>
+<section class="video-section" id="video"><h2>Video walkthrough</h2><p>Laboratory demonstration of VeraCrypt container recovery, standard and hidden encrypted volumes, and deleted-partition analysis.</p><div class="video-container"><iframe src="https://www.youtube-nocookie.com/embed/NlgMI807V2I" title="VeraCrypt data recovery laboratory demonstration" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div><p class="video-note">Video supplied by Hetman Software for this experiment.</p></section>
+<h2>Test environment and storage configuration</h2>
+<table>
+<thead>
+<tr>
+  <th>Property</th>
+  <th>Recorded observation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>Recovery application</td>
+  <td>Hetman Partition Recovery <strong>5.3 Home Edition</strong> (shown in screenshots)</td>
+</tr>
+<tr>
+  <td>Operating environment</td>
+  <td>Windows desktop (version not recorded)</td>
+</tr>
+<tr>
+  <td>VeraCrypt version</td>
+  <td>Not recorded</td>
+</tr>
+<tr>
+  <td>File container</td>
+  <td>VeraCrypt container loaded as RAW disk image, approximately <strong>2 GB</strong> in the application</td>
+</tr>
+<tr>
+  <td>USB device</td>
+  <td><strong>Generic Flash Disk</strong>, capacity <strong>14.56 GB</strong> as displayed</td>
+</tr>
+<tr>
+  <td>Filesystem in unlocked container</td>
+  <td><strong>NTFS</strong></td>
+</tr>
+<tr>
+  <td>Standard VeraCrypt USB volume</td>
+  <td><strong>NTFS</strong>, shown as <strong>14.56 GB</strong> in reconstructed virtual disk view</td>
+</tr>
+<tr>
+  <td>Hidden VeraCrypt volume</td>
+  <td><strong>exFAT</strong>, shown as <strong>1,023.88 MB</strong></td>
+</tr>
+<tr>
+  <td>Authentication</td>
+  <td>Password; separate outer/hidden credentials; interface also supports PIM and key files</td>
+</tr>
+<tr>
+  <td>Test dataset</td>
+  <td>Documents, photographs, videos and other files, with deletion-marked entries visible; baseline totals not recorded</td>
+</tr>
+<tr>
+  <td>Storage sector size</td>
+  <td>Not explicitly documented; offsets are supplied in sectors</td>
+</tr>
+<tr>
+  <td>Ciphers and hash/KDF configuration</td>
+  <td>Not recorded for the tested volumes</td>
+</tr>
+</tbody>
+</table>
+<p>The three workflows are related but distinct. The <code>.hc</code> file-container test begins with an extant encrypted file. The USB test unlocks an existing encrypted volume. The deleted-partition scenario begins with a device shown as unallocated and reconstructs a candidate virtual view of the previous encrypted partition.</p>
+<p><img src="https://raw.githubusercontent.com/HetmanSoftware/data-recovery-lab/main/experiments/veracrypt-containers-hidden-volumes-deleted-partitions/images/veracrypt-volume-creation-wizard.png" alt="VeraCrypt Volume Creation Wizard showing container and partition encryption options" /></p><figcaption>Figure 1. VeraCrypt volume creation wizard showing file-container and partition-based encryption options.</figcaption></figure>
+<h2>Safety and acquisition</h2>
+<p>The source recommends preserving the affected device, avoiding new files or formatting, creating a disk image when the data are valuable, and saving recovered files to <strong>another physical device</strong>. The screenshots do not document a completed forensic acquisition, image hash, hardware write blocker, or write-protection validation; those measures must not be claimed as performed.</p>
+<p>In the deleted-partition workflow, <strong>Create virtual disk</strong> is used in the recovery application. It is distinct from using Windows Disk Management to initialize or format a new partition. The screenshots show a virtual reconstruction, not a successful in-place repair of the original partition table.</p>
+<h2>Experiment 1 — VeraCrypt file-container recovery</h2>
+<h3>Import the encrypted container as a RAW disk</h3>
+<p>The recovery application is opened, <strong>Mount Disk</strong> is selected, and <strong>RAW disk images</strong> is chosen. The VeraCrypt file is located in the filesystem; the script notes that a container can have the <code>.hc</code> extension and may require selecting <em>All files</em> in the file dialog.</p>
+<figure><p><img src="https://raw.githubusercontent.com/HetmanSoftware/data-recovery-lab/main/experiments/veracrypt-containers-hidden-volumes-deleted-partitions/images/hetman-mount-veracrypt-as-raw-image.png" alt="Hetman Partition Recovery Mount Disk wizard with RAW disk images selected" /></p><figcaption>Figure 2. The file container is added through the RAW disk image workflow.</figcaption></figure>
+<figure><p><img src="https://raw.githubusercontent.com/HetmanSoftware/data-recovery-lab/main/experiments/veracrypt-containers-hidden-volumes-deleted-partitions/images/select-veracrypt-file-container.png" alt="File selection dialog with the VeraCrypt file container and key file" /></p><figcaption>Figure 3. Selecting the stored container file; a separate key file is visible in the source directory.</figcaption></figure>
+<p>The application lists the imported file as a mounted RAW disk with a capacity of about 2 GB. The operator opens its context menu and selects <strong>Unlock VeraCrypt Disk</strong>.</p>
+<figure><p><img src="https://raw.githubusercontent.com/HetmanSoftware/data-recovery-lab/main/experiments/veracrypt-containers-hidden-volumes-deleted-partitions/images/unlock-veracrypt-container-menu.png" alt="Hetman Partition Recovery context menu with Unlock VeraCrypt Disk selected" /></p><figcaption>Figure 4. The imported 2 GB container appears as a mounted RAW disk and can be unlocked from the context menu.</figcaption></figure>
+<h3>Unlock and inspect the NTFS volume</h3>
+<p>The unlock dialog requests the password and also provides optional controls for <strong>PIM</strong> and <strong>Key Files</strong>. The screenshot shows a PIM field but does not prove a non-default PIM or key file was used. The correct access parameters are required; scanning ciphertext directly cannot reveal the encrypted filesystem structure.</p>
+<figure><p><img src="https://raw.githubusercontent.com/HetmanSoftware/data-recovery-lab/main/experiments/veracrypt-containers-hidden-volumes-deleted-partitions/images/veracrypt-password-pim-keyfile-dialog.png" alt="VeraCrypt unlock dialog with password PIM and key file controls" /></p><figcaption>Figure 5. The VeraCrypt unlock dialog exposes password, PIM and key-file controls; the image does not establish that every option was used in this test.</figcaption></figure>
+<p>After unlocking, the application identifies the container as an <strong>NTFS</strong> logical volume. The script directs the operator to use a <strong>Fast scan</strong> initially and a <strong>Full analysis</strong> if needed; the source does not give reproducible timing or a scan count for this scenario.</p>
+<figure><p><img src="https://raw.githubusercontent.com/HetmanSoftware/data-recovery-lab/main/experiments/veracrypt-containers-hidden-volumes-deleted-partitions/images/decrypted-veracrypt-container-ntfs.png" alt="Decrypted VeraCrypt container displayed as an NTFS disk" /></p><figcaption>Figure 6. After unlocking, the container appears as an NTFS volume available for filesystem analysis.</figcaption></figure>
+<p>The result browser contains file entries, including deletion indicators. This confirms that file entries were <strong>detected and presented</strong> in the recovered filesystem view. The screenshots do not establish the byte-level integrity or export completion of each item.</p>
+<figure><p><img src="https://raw.githubusercontent.com/HetmanSoftware/data-recovery-lab/main/experiments/veracrypt-containers-hidden-volumes-deleted-partitions/images/veracrypt-container-discovered-deleted-files.png" alt="Found files and deletion markers in the unlocked VeraCrypt container" /></p><figcaption>Figure 7. The result view includes files and deletion markers inside the decrypted container; the screenshot does not quantify validated exports.</figcaption></figure>
+<h2>Experiment 2 — Encrypted USB: standard and hidden volumes</h2>
+<p>The removable <strong>Generic Flash Disk</strong> is selected in the application, and <strong>Unlock with VeraCrypt</strong> is invoked for its encrypted volume. The outer (standard) volume is unlocked using its own password, with PIM and key-file parameters available if configured.</p>
+<figure><p><img src="https://raw.githubusercontent.com/HetmanSoftware/data-recovery-lab/main/experiments/veracrypt-containers-hidden-volumes-deleted-partitions/images/encrypted-usb-unlock-context-menu.png" alt="Encrypted Generic Flash Disk with Unlock with VeraCrypt context menu" /></p><figcaption>Figure 8. The encrypted USB volume is selected and Unlock with VeraCrypt is available.</figcaption></figure>
+<figure><p><img src="https://raw.githubusercontent.com/HetmanSoftware/data-recovery-lab/main/experiments/veracrypt-containers-hidden-volumes-deleted-partitions/images/standard-veracrypt-volume-password-dialog.png" alt="Password dialog for the standard VeraCrypt volume on the USB device" /></p><figcaption>Figure 9. Credentials are entered to access the standard volume separately from the hidden volume.</figcaption></figure>
+<h3>Analyze the decrypted standard volume</h3>
+<p>The operator selects the <em>decrypted logical volume</em>, rather than scanning the encrypted raw device as though it were an ordinary filesystem. A Fast scan dialog is shown, followed by result listings containing existing and deletion-marked items.</p>
+<figure><p><img src="https://raw.githubusercontent.com/HetmanSoftware/data-recovery-lab/main/experiments/veracrypt-containers-hidden-volumes-deleted-partitions/images/veracrypt-usb-fast-scan-dialog.png" alt="File Recovery Wizard selecting a fast scan on an unlocked VeraCrypt volume" /></p><figcaption>Figure 10. The unlocked volume is analyzed using the Fast scan option.</figcaption></figure>
+<figure><p><img src="https://raw.githubusercontent.com/HetmanSoftware/data-recovery-lab/main/experiments/veracrypt-containers-hidden-volumes-deleted-partitions/images/standard-veracrypt-volume-deleted-file-results.png" alt="File results from the unlocked standard VeraCrypt volume including deleted items" /></p><figcaption>Figure 11. The standard volume lists existing and deleted file entries; file previews and export totals are not logged.</figcaption></figure>
+<h3>Hidden volume distinction</h3>
+<p>The hidden VeraCrypt volume is not discoverable just by browsing the unlocked outer filesystem. The script demonstrates reopening the encrypted volume with a <strong>different password</strong> associated with the hidden volume, producing a separate decrypted view. Accordingly, an apparent lack of hidden files while the outer volume is unlocked is not evidence that the hidden volume does not exist.</p>
+<p>This experiment illustrates credential-based access to both volumes, not brute-force password recovery or automatic detection of an unknown hidden volume.</p>
+<h2>Experiment 3 — Lost partition table after <code>diskpart clean</code></h2>
+<h3>Starting state</h3>
+<p>The script discusses partition records removed by the Windows command <code>diskpart clean</code>; the underlying command-session log is not provided. The observed result in Windows Disk Management is that the <strong>14.56 GB</strong> USB drive appears <strong>unallocated</strong>. Neither the picture nor the script establishes that the encrypted user sectors were overwritten.</p>
+<figure><p><img src="https://raw.githubusercontent.com/HetmanSoftware/data-recovery-lab/main/experiments/veracrypt-containers-hidden-volumes-deleted-partitions/images/windows-disk-management-usb-unallocated.png" alt="Windows Disk Management showing Generic Flash Disk as unallocated" /></p><figcaption>Figure 12. Windows Disk Management presents the 14.56 GB removable drive as unallocated following partition-table loss.</figcaption></figure>
+<h3>Define the candidate encrypted partition boundaries</h3>
+<p>In Hetman Partition Recovery the operator selects the entire physical USB device and chooses <strong>Create virtual disk</strong>. This operation defines a virtual range corresponding to the candidate lost volume. The recorded dialog values are:</p>
+<pre><code class="language-text">Source physical device: Generic Flash Disk (14.56 GB as displayed)
+Virtual disk start: 2,048 sectors
+Virtual disk length: 30,533,632 sectors
+Reported physical sector span: 30,535,680 sectors
+</code></pre>
+<p>These are observations from the specific interface screenshot, <strong>not universal VeraCrypt offsets</strong>. The sector size and the derivation of these boundaries are not separately verified in the script; applying them to another device without analyzing its layout could produce a false reconstruction.</p>
+<figure><p><img src="https://raw.githubusercontent.com/HetmanSoftware/data-recovery-lab/main/experiments/veracrypt-containers-hidden-volumes-deleted-partitions/images/create-virtual-disk-from-unallocated-usb.png" alt="Create virtual disk command for the unallocated USB drive" /></p><figcaption>Figure 13. A virtual disk is constructed for the lost encrypted partition without demonstrating a partition-table rewrite.</figcaption></figure>
+<figure><p><img src="https://raw.githubusercontent.com/HetmanSoftware/data-recovery-lab/main/experiments/veracrypt-containers-hidden-volumes-deleted-partitions/images/veracrypt-virtual-disk-start-sector-2048.png" alt="Create virtual disk dialog showing start sector 2048 and size 30533632 sectors" /></p><figcaption>Figure 14. The demonstrated virtual disk starts at sector 2,048 and has a selected length of 30,533,632 sectors; these values are specific to this screenshot.</figcaption></figure>
+<h3>Unlock the reconstructed standard NTFS volume</h3>
+<p>The application lists <strong>Virtual Disk 0</strong>, which is unlocked via <strong>Unlock VeraCrypt Disk</strong> with the standard-volume credentials. It is then shown as <strong>14.56 GB [NTFS, VeraCrypt]</strong>. The folder view includes both normal and deletion-marked entries.</p>
+<figure><p><img src="https://raw.githubusercontent.com/HetmanSoftware/data-recovery-lab/main/experiments/veracrypt-containers-hidden-volumes-deleted-partitions/images/unlock-reconstructed-veracrypt-partition.png" alt="Virtual Disk 0 with Unlock VeraCrypt Disk selected" /></p><figcaption>Figure 15. The newly defined virtual disk is submitted for VeraCrypt unlocking.</figcaption></figure>
+<figure><p><img src="https://raw.githubusercontent.com/HetmanSoftware/data-recovery-lab/main/experiments/veracrypt-containers-hidden-volumes-deleted-partitions/images/reconstructed-veracrypt-password-dialog.png" alt="Unlock Disk dialog accepting password PIM and key files for a reconstructed volume" /></p><figcaption>Figure 16. The reconstructed encrypted partition is unlocked using its access credentials.</figcaption></figure>
+<figure><p><img src="https://raw.githubusercontent.com/HetmanSoftware/data-recovery-lab/main/experiments/veracrypt-containers-hidden-volumes-deleted-partitions/images/reconstructed-veracrypt-ntfs-volume.png" alt="Reconstructed Virtual Disk 0 displayed as NTFS VeraCrypt 14.56 GB" /></p><figcaption>Figure 17. The standard decrypted virtual volume is recognized as NTFS in the test UI.</figcaption></figure>
+<figure><p><img src="https://raw.githubusercontent.com/HetmanSoftware/data-recovery-lab/main/experiments/veracrypt-containers-hidden-volumes-deleted-partitions/images/deleted-files-after-veracrypt-partition-loss.png" alt="Recovered directory view with existing and deleted files from recreated VeraCrypt partition" /></p><figcaption>Figure 18. The reconstructed standard volume exposes a directory tree with deletion-marked entries.</figcaption></figure>
+<h3>Unlock the hidden exFAT volume separately</h3>
+<p>A second virtual entry is selected for unlocking with the hidden-volume credentials. The corresponding result identifies <strong>Virtual Disk 1</strong> as <strong>1,023.88 MB [exFAT, VeraCrypt]</strong>. This is important evidence that the hidden-volume decryption and filesystem interpretation did not simply reuse the outer NTFS view.</p>
+<figure><p><img src="https://raw.githubusercontent.com/HetmanSoftware/data-recovery-lab/main/experiments/veracrypt-containers-hidden-volumes-deleted-partitions/images/unlock-hidden-veracrypt-volume.png" alt="Virtual Disk 1 with Unlock VeraCrypt Disk selected" /></p><figcaption>Figure 19. A separate virtual-disk entry is unlocked with the hidden volume credentials.</figcaption></figure>
+<figure><p><img src="https://raw.githubusercontent.com/HetmanSoftware/data-recovery-lab/main/experiments/veracrypt-containers-hidden-volumes-deleted-partitions/images/veracrypt-hidden-exfat-volume-1023mb.png" alt="Hidden VeraCrypt virtual volume recognized as exFAT and 1023.88 MB" /></p><figcaption>Figure 20. The second unlocked volume is detected as a 1,023.88 MB exFAT VeraCrypt volume.</figcaption></figure>
+<h2>Results and evidence level</h2>
+<table>
+<thead>
+<tr>
+  <th>Tested workflow</th>
+  <th>Decrypted filesystem identified</th>
+  <th>File entries visible</th>
+  <th>Exported files</th>
+  <th>Integrity-verified exports</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>File container imported as RAW disk</td>
+  <td>NTFS</td>
+  <td>Yes, including deletion markers</td>
+  <td>Not recorded</td>
+  <td>Not recorded</td>
+</tr>
+<tr>
+  <td>Existing encrypted USB standard volume</td>
+  <td>Supported; file browser visible</td>
+  <td>Yes, including deletion markers</td>
+  <td>Not recorded</td>
+  <td>Not recorded</td>
+</tr>
+<tr>
+  <td>Virtual reconstruction after partition-table loss, outer volume</td>
+  <td>NTFS, 14.56 GB shown</td>
+  <td>Yes, including deletion markers</td>
+  <td>Not recorded</td>
+  <td>Not recorded</td>
+</tr>
+<tr>
+  <td>Re-unlock with hidden-volume credentials</td>
+  <td>exFAT, 1,023.88 MB shown</td>
+  <td>The scan workflow is described; final individual files not independently verified</td>
+  <td>Not recorded</td>
+  <td>Not recorded</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Interpretation:</strong> A file marked as deleted in the application's result list is evidence of an enumerated file entry, not proof that its clusters remained intact, that it was exported successfully, or that its content hash matches the original file. No aggregate recovery rate is supported by this source.</p>
+<h2>Limitations</h2>
+<ul>
+<li>The test date, VeraCrypt version, complete creation parameters, encryption algorithm for each volume, KDF and volume-header details are not recorded.</li>
+<li>The screenshots show a Windows-based recovery workflow, not a test of VeraCrypt container recovery on other platforms.</li>
+<li>PIM and key-file support appears in the user interface, but each possible authentication combination was <strong>not individually validated</strong> by the supplied measurements.</li>
+<li>The presence of a separate hidden volume and its exFAT identification are demonstrated, but the source does not establish guaranteed recovery from all hidden-volume failure modes.</li>
+<li>No proof of successful export, application-open checks, file hashes or full dataset comparison is provided.</li>
+<li>The <code>diskpart clean</code> command is described in the script, but a console execution log and before/after sector-level diff are unavailable.</li>
+<li>The test does not establish recovery when a password or mandatory key file is lost, or when VeraCrypt volume headers are irreparably damaged.</li>
+</ul>
+<h2>Conclusion</h2>
+<p>For the specific environments pictured here, Hetman Partition Recovery 5.3 displayed an encrypted VeraCrypt file container as an unlockable RAW disk, identified the decrypted NTFS content, and showed deletion-marked file entries. For the removable device, the interface also showed separate standard <strong>NTFS</strong> and hidden <strong>exFAT</strong> volume interpretations. After the partition table became unavailable, a <strong>virtual</strong> partition definition beginning at sector <strong>2,048</strong> permitted a subsequent VeraCrypt unlock and filesystem analysis.</p>
+<p>The supported technical finding is <strong>successful access to and enumeration of filesystem entries after unlocking or virtual reconstruction</strong>, not a quantified or independently validated data-recovery success rate.</p>
+<h2>Video walkthrough</h2>
+<p>Video supplied for this laboratory case: https://www.youtube.com/watch?v=NlgMI807V2I</p>
+<p>Watch the <a href="https://hetmansoftware.github.io/data-recovery-lab/experiments/veracrypt-containers-hidden-volumes-deleted-partitions/">embedded video in the HTML version</a>.</p>
+<h2>Related resources and provenance</h2>
+<ul>
+<li>Primary source: <code>83Article_Відновлення даних з дисків зашифрованих VeraCrypt.docx</code> (source experiment script, screenshots extracted without redrawing)</li>
+<li><a href="https://hetmanrecovery.com/recovery_news/how-to-recover-data-from-veracrypt-drives-and-containers">Original English-language article on Hetman Software</a></li>
+<li><a href="https://github.com/HetmanSoftware/data-recovery-lab">Hetman Data Recovery Lab GitHub repository</a></li>
+</ul>
+</article></main><footer>Hetman Software Data Recovery Lab · <a href="https://hetmanrecovery.com/">hetmanrecovery.com</a></footer></body></html>

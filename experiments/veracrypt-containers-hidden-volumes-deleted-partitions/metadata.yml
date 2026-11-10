@@ -1,0 +1,128 @@
+experiment:
+  slug: veracrypt-containers-hidden-volumes-deleted-partitions
+  title: 'VeraCrypt recovery lab: file containers, hidden volumes, and deleted encrypted
+    partitions'
+  category: Encryption
+  date: null
+  status: published
+  summary: Source-grounded test of VeraCrypt container unlocking, standard and hidden
+    encrypted USB volumes, and virtual reconstruction after deletion of partition-table
+    entries.
+  hardware: Generic Flash Disk, 14.56 GB displayed; 2 GB file container
+  operating_system: Windows version not recorded
+  storage_topology: VeraCrypt container; USB encrypted partition with standard and
+    hidden volume
+  filesystem: NTFS (container/standard); exFAT (hidden)
+  failure_scenario: Deleted file entries; lost partition table described as diskpart
+    clean
+  youtube_id: NlgMI807V2I
+  cover: veracrypt-data-recovery-cover-en.webp
+  evidence_notes: Detected files not equal to exported/verified; actual export counts
+    not recorded
+  article:
+    markdown: experiments/veracrypt-containers-hidden-volumes-deleted-partitions/README.md
+    html: docs/experiments/veracrypt-containers-hidden-volumes-deleted-partitions/index.html
+  figures:
+  - filename: veracrypt-volume-creation-wizard.png
+    alt: VeraCrypt Volume Creation Wizard showing container and partition encryption
+      options
+    caption: VeraCrypt volume creation wizard showing file-container and partition-based
+      encryption options.
+    provenance: DOCX original embedded screenshot word/media/image3.png
+  - filename: hetman-mount-veracrypt-as-raw-image.png
+    alt: Hetman Partition Recovery Mount Disk wizard with RAW disk images selected
+    caption: The file container is added through the RAW disk image workflow.
+    provenance: DOCX original embedded screenshot word/media/image4.png
+  - filename: select-veracrypt-file-container.png
+    alt: File selection dialog with the VeraCrypt file container and key file
+    caption: Selecting the stored container file; a separate key file is visible in
+      the source directory.
+    provenance: DOCX original embedded screenshot word/media/image5.png
+  - filename: unlock-veracrypt-container-menu.png
+    alt: Hetman Partition Recovery context menu with Unlock VeraCrypt Disk selected
+    caption: The imported 2 GB container appears as a mounted RAW disk and can be
+      unlocked from the context menu.
+    provenance: DOCX original embedded screenshot word/media/image6.png
+  - filename: veracrypt-password-pim-keyfile-dialog.png
+    alt: VeraCrypt unlock dialog with password PIM and key file controls
+    caption: The VeraCrypt unlock dialog exposes password, PIM and key-file controls;
+      the image does not establish that every option was used in this test.
+    provenance: DOCX original embedded screenshot word/media/image7.png
+  - filename: decrypted-veracrypt-container-ntfs.png
+    alt: Decrypted VeraCrypt container displayed as an NTFS disk
+    caption: After unlocking, the container appears as an NTFS volume available for
+      filesystem analysis.
+    provenance: DOCX original embedded screenshot word/media/image8.png
+  - filename: veracrypt-container-discovered-deleted-files.png
+    alt: Found files and deletion markers in the unlocked VeraCrypt container
+    caption: The result view includes files and deletion markers inside the decrypted
+      container; the screenshot does not quantify validated exports.
+    provenance: DOCX original embedded screenshot word/media/image9.png
+  - filename: encrypted-usb-unlock-context-menu.png
+    alt: Encrypted Generic Flash Disk with Unlock with VeraCrypt context menu
+    caption: The encrypted USB volume is selected and Unlock with VeraCrypt is available.
+    provenance: DOCX original embedded screenshot word/media/image10.png
+  - filename: standard-veracrypt-volume-password-dialog.png
+    alt: Password dialog for the standard VeraCrypt volume on the USB device
+    caption: Credentials are entered to access the standard volume separately from
+      the hidden volume.
+    provenance: DOCX original embedded screenshot word/media/image11.png
+  - filename: veracrypt-usb-fast-scan-dialog.png
+    alt: File Recovery Wizard selecting a fast scan on an unlocked VeraCrypt volume
+    caption: The unlocked volume is analyzed using the Fast scan option.
+    provenance: DOCX original embedded screenshot word/media/image12.png
+  - filename: standard-veracrypt-volume-deleted-file-results.png
+    alt: File results from the unlocked standard VeraCrypt volume including deleted
+      items
+    caption: The standard volume lists existing and deleted file entries; file previews
+      and export totals are not logged.
+    provenance: DOCX original embedded screenshot word/media/image13.png
+  - filename: windows-disk-management-usb-unallocated.png
+    alt: Windows Disk Management showing Generic Flash Disk as unallocated
+    caption: Windows Disk Management presents the 14.56 GB removable drive as unallocated
+      following partition-table loss.
+    provenance: DOCX original embedded screenshot word/media/image14.png
+  - filename: create-virtual-disk-from-unallocated-usb.png
+    alt: Create virtual disk command for the unallocated USB drive
+    caption: A virtual disk is constructed for the lost encrypted partition without
+      demonstrating a partition-table rewrite.
+    provenance: DOCX original embedded screenshot word/media/image15.png
+  - filename: veracrypt-virtual-disk-start-sector-2048.png
+    alt: Create virtual disk dialog showing start sector 2048 and size 30533632 sectors
+    caption: The demonstrated virtual disk starts at sector 2,048 and has a selected
+      length of 30,533,632 sectors; these values are specific to this screenshot.
+    provenance: DOCX original embedded screenshot word/media/image16.png
+  - filename: unlock-reconstructed-veracrypt-partition.png
+    alt: Virtual Disk 0 with Unlock VeraCrypt Disk selected
+    caption: The newly defined virtual disk is submitted for VeraCrypt unlocking.
+    provenance: DOCX original embedded screenshot word/media/image17.png
+  - filename: reconstructed-veracrypt-password-dialog.png
+    alt: Unlock Disk dialog accepting password PIM and key files for a reconstructed
+      volume
+    caption: The reconstructed encrypted partition is unlocked using its access credentials.
+    provenance: DOCX original embedded screenshot word/media/image18.png
+  - filename: reconstructed-veracrypt-ntfs-volume.png
+    alt: Reconstructed Virtual Disk 0 displayed as NTFS VeraCrypt 14.56 GB
+    caption: The standard decrypted virtual volume is recognized as NTFS in the test
+      UI.
+    provenance: DOCX original embedded screenshot word/media/image19.png
+  - filename: deleted-files-after-veracrypt-partition-loss.png
+    alt: Recovered directory view with existing and deleted files from recreated VeraCrypt
+      partition
+    caption: The reconstructed standard volume exposes a directory tree with deletion-marked
+      entries.
+    provenance: DOCX original embedded screenshot word/media/image20.png
+  - filename: unlock-hidden-veracrypt-volume.png
+    alt: Virtual Disk 1 with Unlock VeraCrypt Disk selected
+    caption: A separate virtual-disk entry is unlocked with the hidden volume credentials.
+    provenance: DOCX original embedded screenshot word/media/image21.png
+  - filename: veracrypt-hidden-exfat-volume-1023mb.png
+    alt: Hidden VeraCrypt virtual volume recognized as exFAT and 1023.88 MB
+    caption: The second unlocked volume is detected as a 1,023.88 MB exFAT VeraCrypt
+      volume.
+    provenance: DOCX original embedded screenshot word/media/image22.png
+  measurements:
+    detected_files: null
+    exported_files: null
+    integrity_verified_files: null
+    note: null means not recorded
