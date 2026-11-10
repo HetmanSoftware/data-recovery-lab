@@ -6,7 +6,7 @@
 <meta name="description" content="Synology DS409 RAID1 to RAID5 migration interrupted at 29.55%, followed by disk loss. Technical lab report showing MD RAID reconstruction, Ext4 scans and results."/>
 <meta property="og:title" content="Synology DS409 RAID1 to RAID5 migration failure — Hetman Data Recovery Lab"/>
 <meta property="og:description" content="Technical experiment: a RAID migration halted at 29.55%, one original disk lost, reconstruction of both RAID5 and RAID1."/>
-<meta property="og:image" content="https://raw.githubusercontent.com/HetmanSoftware/data-recovery-lab/main/experiments/synology-ds409-raid1-to-raid5-migration-failure/images/synology-ds409-raid1-to-raid5-cover.jpg"/>
+<meta property="og:image" content="https://raw.githubusercontent.com/HetmanSoftware/data-recovery-lab/main/experiments/synology-ds409-raid1-to-raid5-migration-failure/images/synology-ds409-raid1-to-raid5-cover-en.webp"/>
 <title>Synology DS409 RAID1 to RAID5 Migration Failure | Hetman Data Recovery Lab</title>
 <style>
 :root{color-scheme:light;--text:#14233b;--muted:#586a83;--accent:#176db8;--border:#dbe5ee;--surface:#f5f8fc}
@@ -41,7 +41,7 @@ footer{border-top:1px solid var(--border);padding:28px 24px;text-align:center;co
 </style></head>
 <body><header><nav><strong>Hetman Software · Data Recovery Lab</strong><a href="https://github.com/HetmanSoftware/data-recovery-lab">View GitHub repository</a></nav></header>
 <main><article><h1 id="synology-ds409-raid1-to-raid5-migration-interrupted-at-2955-what-survived-after-losing-an-original-disk">Synology DS409 RAID1 to RAID5 migration interrupted at 29.55%: what survived after losing an original disk?</h1>
-<figure><img src="https://raw.githubusercontent.com/HetmanSoftware/data-recovery-lab/main/experiments/synology-ds409-raid1-to-raid5-migration-failure/images/synology-ds409-raid1-to-raid5-cover.jpg" alt="Synology DS409 RAID1 to RAID5 interrupted migration" loading="lazy"/><figcaption></figcaption></figure>
+<figure><img src="https://raw.githubusercontent.com/HetmanSoftware/data-recovery-lab/main/experiments/synology-ds409-raid1-to-raid5-migration-failure/images/synology-ds409-raid1-to-raid5-cover-en.webp" alt="Synology DS409 RAID1 to RAID5 interrupted migration" loading="lazy"/><figcaption></figcaption></figure>
 <p>We reproduced a specific Synology NAS failure scenario that can be confusing during recovery: a <strong>RAID1 → RAID5 migration</strong> was interrupted by a power loss, and then <strong>one of the two original RAID1 disks was no longer available</strong>. The result was not simply a degraded RAID5. Part of the address space had already been reshaped into the new RAID5 layout, while another part still reflected the earlier RAID1 layout.</p>
 <p>The goal of this experiment was not to bring the NAS back online. We wanted to determine:</p>
 <ul><li>what the two remaining physical disks could still reveal about the array;</li><li>whether the current RAID5 geometry could be detected automatically;</li><li>whether part of the old RAID1 layout was still recoverable;</li><li>how the recovery results differed between the <strong>new</strong> and <strong>old</strong> geometries.</li></ul>
