@@ -2,11 +2,6 @@
 
 ![VeraCrypt data recovery experiment: file containers, encrypted USB drives, and deleted partitions](images/veracrypt-data-recovery-cover-en.webp)
 
-**Lab:** Hetman Software Data Recovery Lab  
-**Experiment date:** Not recorded in the source script  
-**Scenario:** `veracrypt-containers-hidden-volumes-deleted-partitions`  
-**Demonstration video:** https://www.youtube.com/watch?v=NlgMI807V2I
-
 ## Research question and scope
 
 This case study examines whether previously stored and deleted files remain discoverable after an existing VeraCrypt file container, standard encrypted USB volume or hidden VeraCrypt volume is unlocked in a filesystem recovery tool. It also examines how to analyze encrypted volumes when their partition-table entries have been removed.
@@ -221,15 +216,3 @@ A second virtual entry is selected for unlocking with the hidden-volume credenti
 For the specific environments pictured here, Hetman Partition Recovery 5.3 displayed an encrypted VeraCrypt file container as an unlockable RAW disk, identified the decrypted NTFS content, and showed deletion-marked file entries. For the removable device, the interface also showed separate standard **NTFS** and hidden **exFAT** volume interpretations. After the partition table became unavailable, a **virtual** partition definition beginning at sector **2,048** permitted a subsequent VeraCrypt unlock and filesystem analysis.
 
 The supported technical finding is **successful access to and enumeration of filesystem entries after unlocking or virtual reconstruction**, not a quantified or independently validated data-recovery success rate.
-
-## Video walkthrough
-
-Video supplied for this laboratory case: https://www.youtube.com/watch?v=NlgMI807V2I
-
-Watch the [embedded video in the HTML version](https://hetmansoftware.github.io/data-recovery-lab/experiments/veracrypt-containers-hidden-volumes-deleted-partitions/).
-
-## Related resources and provenance
-
-- Primary source: `83Article_Відновлення даних з дисків зашифрованих VeraCrypt.docx` (source experiment script, screenshots extracted without redrawing)
-- [Original English-language article on Hetman Software](https://hetmanrecovery.com/recovery_news/how-to-recover-data-from-veracrypt-drives-and-containers)
-- [Hetman Data Recovery Lab GitHub repository](https://github.com/HetmanSoftware/data-recovery-lab)
