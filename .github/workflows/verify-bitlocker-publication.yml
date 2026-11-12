@@ -1,0 +1,61 @@
+name: Verify BitLocker published article
+on:
+  push:
+    paths:
+      - '.github/workflows/verify-bitlocker-publication.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check Markdown, screenshots, cover and video
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          base=Path('experiments/bitlocker-system-hdd-usb-data-recovery')
+          md=(base/'README.md').read_text(encoding='utf-8')
+          html=Path('docs/experiments/bitlocker-system-hdd-usb-data-recovery/index.html').read_text(encoding='utf-8')
+          images=set(re.findall(r'images/([\w-]+\.(?:webp|png))',md))
+          assert len(images)==15,(len(images),sorted(images))
+          assert len(list((base/'images').glob('*.png')))==14
+          for name in images:
+              path=base/'images'/name
+              assert path.is_file() and path.stat().st_size>2000,path
+              signature=path.read_bytes()[:12]
+              assert signature.startswith(b'\x89PNG\r\n\x1a\n') if name.endswith('.png') else signature[:4]==b'RIFF' and signature[8:12]==b'WEBP',name
+              assert name in html,name
+          assert 'https://www.youtube-nocookie.com/embed/CbMA34Zr0ak' in html
+          assert 'https://www.youtube.com/watch?v=CbMA34Zr0ak' in md
+          assert 'bitlocker-system-hdd-usb-data-recovery' in Path('docs/index.html').read_text()
+          assert 'bitlocker-system-hdd-usb-data-recovery' in Path('README.md').read_text()
+          print('PASS: 15 local images, matching references, HTML iframe, video link and two indexes')
+          PY
+      - name: Verify deployed GitHub Pages article and published images
+        run: |
+          python - <<'PY'
+          import time,urllib.request
+          page='https://hetmansoftware.github.io/data-recovery-lab/experiments/bitlocker-system-hdd-usb-data-recovery/'
+          for attempt in range(8):
+              try:
+                  with urllib.request.urlopen(page,timeout=20) as response:
+                      body=response.read().decode('utf-8')
+                      assert response.status==200
+                      assert 'CbMA34Zr0ak' in body
+                      assert 'bitlocker-recovery-cover.webp' in body
+                      assert 'usb-found-files.png' in body
+                  print('PASS: live GitHub Pages article HTTP 200 and expected references')
+                  break
+              except Exception as exc:
+                  print('Attempt',attempt+1,str(exc))
+                  if attempt==7: raise
+                  time.sleep(15)
+          for name in ['bitlocker-recovery-cover.webp','system-fast-scan.png','secondary-hdd-bek-key.png','usb-found-files.png']:
+              url='https://raw.githubusercontent.com/HetmanSoftware/data-recovery-lab/main/experiments/bitlocker-system-hdd-usb-data-recovery/images/'+name
+              with urllib.request.urlopen(url,timeout=20) as r:
+                  assert r.status==200 and len(r.read())>2000,name
+              print('PASS:',name)
+          PY
