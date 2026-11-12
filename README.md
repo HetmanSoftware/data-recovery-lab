@@ -33,7 +33,7 @@ data-recovery-lab/
 
 ### NTFS / EFS encrypted files
 
-- [Recovering EFS-encrypted files on NTFS with a PFX certificate](experiments/ntfs-efs-encrypted-file-recovery/README.md)
+- [How to Recover Deleted EFS-Encrypted Files from an NTFS Drive](experiments/recover-deleted-efs-files-ntfs/README.md)
 
 ## Planned categories
 
