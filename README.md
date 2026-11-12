@@ -35,6 +35,10 @@ data-recovery-lab/
 
 - [How to Recover Deleted EFS-Encrypted Files from an NTFS Drive](experiments/recover-deleted-efs-files-ntfs/README.md)
 
+### BitLocker / encrypted storage
+
+- [Recovering Deleted Files from BitLocker-Encrypted Drives: Windows 11, HDD, and USB](experiments/bitlocker-system-hdd-usb-data-recovery/README.md)
+
 ## Planned categories
 
 - Synology NAS
