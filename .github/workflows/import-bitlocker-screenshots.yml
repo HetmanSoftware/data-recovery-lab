@@ -1,0 +1,90 @@
+name: Import original BitLocker screenshots
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/import-bitlocker-screenshots.yml'
+permissions:
+  contents: write
+jobs:
+  import-original-images:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install image dependencies
+        run: python -m pip install --disable-pip-version-check pillow beautifulsoup4 requests
+      - name: Download and identify original screenshots
+        run: |
+          python - <<'PYCODE'
+          import io, re, urllib.parse
+          from pathlib import Path
+          import requests
+          from bs4 import BeautifulSoup
+          from PIL import Image
+          source = 'https://hetmanrecovery.com/recovery_news/how-to-recover-data-from-bitlocker-drive/'
+          session=requests.Session()
+          session.headers.update({'User-Agent':'Mozilla/5.0 (compatible; HetmanDataRecoveryLab/1.0)'})
+          response=session.get(source,timeout=45)
+          response.raise_for_status()
+          html=BeautifulSoup(response.text,'html.parser')
+          pictures=[]
+          for tag in html.select('img'):
+              alt=' '.join(tag.get('alt','').split())
+              url=None
+              for key in ['data-src','data-original','data-lazy-src','src']:
+                  candidate=tag.get(key)
+                  if candidate and not candidate.startswith('data:'):
+                      url=urllib.parse.urljoin(source,candidate)
+                      break
+              if not url and tag.get('srcset'):
+                  url=urllib.parse.urljoin(source,tag['srcset'].split(',')[-1].strip().split()[0])
+              if url and alt:
+                  pictures.append((alt,url))
+          wanted = [
+            ('bitlocker-drive-connection.png','Connecting BitLocker drives to another PC',0),
+            ('windows-bitlocker-recovery-screen.png','BitLocker blocked access',0),
+            ('system-volume-locked.png','Fully locked BitLocker volume',0),
+            ('system-recovery-key-dialog.png','Hetman Partition Recovery: unlocking a BitLocker drive',0),
+            ('system-fast-scan.png','Hetman Partition Recovery: fast scan of a BitLocker drive',0),
+            ('system-found-files.png','Hetman Partition Recovery: found files on a BitLocker drive',0),
+            ('secondary-hdd-unlock-menu.png','Hetman Partition Recovery: unlocking a BitLocker drive',1),
+            ('secondary-hdd-bek-key.png','.bek',0),
+            ('secondary-hdd-unlocked.png','Hetman Partition Recovery: unlocked BitLocker drive',0),
+            ('secondary-hdd-found-files.png','Hetman Partition Recovery: files on an unlocked BitLocker drive',0),
+            ('usb-locked-windows.png','Windows: locked BitLocker flash drive',0),
+            ('usb-bitlocker-detected.png','Hetman Partition Recovery: locked BitLocker flash drive',0),
+            ('usb-password-unlock.png','Hetman Partition Recovery: unlocking a BitLocker flash drive with a password',0),
+            ('usb-found-files.png','Hetman Partition Recovery: files on an unlocked BitLocker flash drive',0)
+          ]
+          dest=Path('experiments/bitlocker-system-hdd-usb-data-recovery/images')
+          dest.mkdir(parents=True,exist_ok=True)
+          used=set()
+          for name,needle,occ in wanted:
+              matches=[(alt,url) for alt,url in pictures if needle.casefold() in alt.casefold()]
+              if len(matches)<=occ:
+                  print('Image labels:',*[a for a,u in pictures],sep='\n - ')
+                  raise RuntimeError('Missing evidence image '+name+': '+needle)
+              alt,url=matches[occ]
+              if url in used:
+                  raise RuntimeError('Duplicate screenshot URL: '+name+' / '+url)
+              used.add(url)
+              host=urllib.parse.urlparse(url).hostname or ''
+              if not (host=='hetmanrecovery.com' or host=='www.hetmanrecovery.com' or host.endswith('.hetmanrecovery.com')):
+                  raise RuntimeError('Unexpected host '+url)
+              result=session.get(url,timeout=45,headers={'Referer':source})
+              result.raise_for_status()
+              pic=Image.open(io.BytesIO(result.content)).convert('RGB')
+              if min(pic.size)<150: raise RuntimeError('Image too small '+name+': '+str(pic.size))
+              pic.save(dest/name,'PNG',optimize=True)
+              print(name,pic.size,alt,url)
+          assert len(list(dest.glob('*.png')))==len(wanted)
+          PYCODE
+      - name: Commit screenshots
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add experiments/bitlocker-system-hdd-usb-data-recovery/images/
+          if ! git diff --cached --quiet; then
+            git commit -m "Add original BitLocker recovery screenshots"
+            git push
+          fi
