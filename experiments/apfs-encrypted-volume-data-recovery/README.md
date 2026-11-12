@@ -1,6 +1,6 @@
 # Recovering Files from APFS Encrypted Volumes: Deleted Files and Lost Partitions
 
-![English illustration of an APFS encrypted disk and its unlocking process](images/apfs-encrypted-recovery-cover-en.png)
+![English illustration of an APFS encrypted disk and its unlocking process](images/apfs-encrypted-recovery-cover-en.webp)
 
 *Cover illustration. Concept art; not an experimental screenshot.*
 

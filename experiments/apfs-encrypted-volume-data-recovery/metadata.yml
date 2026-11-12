@@ -13,7 +13,7 @@ experiment:
   source_article: "https://hetmanrecovery.com/recovery_news/how-to-recover-data-from-encrypted-apfs-disk/"
   source_video_id: "UAoZEK6yuXc"
   youtube_id: "bkXcrFO3Wi4"
-  cover: "apfs-encrypted-recovery-cover-en.png"
+  cover: "apfs-encrypted-recovery-cover-en.webp"
   evidence_notes: "Original screenshots demonstrate UI states, file previews and partition detection. Exports and file integrity checks not recorded."
   measurements:
     exported_files: null
