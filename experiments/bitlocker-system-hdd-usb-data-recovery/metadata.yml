@@ -1,0 +1,14 @@
+experiment:
+  slug: "bitlocker-system-hdd-usb-data-recovery"
+  title: "Recovering Deleted Files from BitLocker-Encrypted Drives: Windows 11, HDD, and USB"
+  category: "Encryption / BitLocker"
+  date: null
+  status: published
+  software: "Hetman Partition Recovery 5.3 (visible in screenshots)"
+  scenarios: ["Windows 11 system volume", "secondary HDD", "BitLocker To Go USB"]
+  source: "73Article_Відновлення видалених файлів із зашифрованих носіїв BitLocker.docx"
+  source_video_id: "rEInLeqtsYE"
+  english_video_id: "CbMA34Zr0ak"
+  cover: "bitlocker-recovery-cover.webp"
+  evidence_notes: "Screenshot observations confirm unlock and listed files; export counts and integrity checks not recorded."
+  figures: 14
