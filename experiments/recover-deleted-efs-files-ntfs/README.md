@@ -10,7 +10,7 @@ For a deleted EFS file, stop writing to the affected disk immediately. The file'
 
 ## Video demonstration
 
-[Watch the demonstration: recovering deleted EFS files on an NTFS disk](https://www.youtube.com/watch?v=BVURoMK53uc). An embedded player is also available in the HTML edition of this article.
+[Watch the demonstration: recovering deleted EFS files on an NTFS disk](https://www.youtube.com/watch?v=8-E0E0V7A_8). An embedded player is also available in the HTML edition of this article.
 
 ## What is Windows EFS?
 
