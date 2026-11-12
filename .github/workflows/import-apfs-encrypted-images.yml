@@ -1,0 +1,54 @@
+name: Import original APFS Encrypted screenshots
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/import-apfs-encrypted-images.yml'
+permissions:
+  contents: write
+jobs:
+  import-original-images:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install dependencies
+        run: python -m pip install --disable-pip-version-check requests pillow cairosvg
+      - name: Download original publication screenshots and render cover
+        run: |
+          python - <<'PYCODE'
+          import io, requests
+          from pathlib import Path
+          from PIL import Image
+          import cairosvg
+          names = ["apfs-encrypted-format-in-disk-utility.png","hetman-partition-recovery-apfs-encrypted-usb.png","hetman-partition-recovery-apfs-encrypted-volume-status.png","hetman-partition-recovery-unlock-apfs-encrypted-volume.png","hetman-partition-recovery-detected-apfs-encrypted-disk.png","hetman-partition-recovery-apfs-encrypted-recovery-results.png","hetman-partition-recovery-full-analysis-apfs.png","hetman-partition-recovery-unlock-apfs-with-password.png","hetman-partition-recovery-find-partitions-on-disk.png","hetman-partition-recovery-find-lost-apfs-partitions.png","hetman-partition-recovery-apfs-partition-search-range.png","hetman-partition-recovery-detected-apfs-partition-after-search.png","hetman-partition-recovery-found-encrypted-apfs-volume.png","hetman-partition-recovery-apfs-files-preview.png"]
+          dst=Path('experiments/apfs-encrypted-volume-data-recovery/images')
+          dst.mkdir(parents=True,exist_ok=True)
+          session=requests.Session(); session.headers.update({'User-Agent':'Mozilla/5.0 (compatible; HetmanDataRecoveryLab/1.0)'})
+          for name in names:
+              data=None;last=None
+              for prefix in ['https://hetmanrecovery.com/uk/pic/blog/a46/','https://hetmanrecovery.com/pic/blog/a46/']:
+                  url=prefix+name
+                  try:
+                      r=session.get(url,timeout=45,headers={'Referer':'https://hetmanrecovery.com/uk/recovery_news/how-to-recover-data-from-encrypted-apfs-disk/'});r.raise_for_status()
+                      pic=Image.open(io.BytesIO(r.content));pic.verify()
+                      pic=Image.open(io.BytesIO(r.content))
+                      if pic.width<600 or pic.height<200:raise ValueError('Unexpected dimensions '+str(pic.size))
+                      if pic.format!='PNG':raise ValueError('Expected PNG evidence, got '+str(pic.format))
+                      data=r.content;print(name, pic.size, url);break
+                  except Exception as exc:last=exc
+              if data is None:raise RuntimeError('Cannot download original '+name+': '+str(last))
+              (dst/name).write_bytes(data)
+          assert len(list(dst.glob('*.png')))==len(names)
+          cairosvg.svg2png(url=str(dst/'apfs-encrypted-recovery-cover-en.svg'),write_to=str(dst/'apfs-encrypted-recovery-cover-en.png'),output_width=1200,output_height=675)
+          assert Image.open(dst/'apfs-encrypted-recovery-cover-en.png').size==(1200,675)
+          print('Imported',len(names),'original screenshots and rendered English cover')
+          PYCODE
+      - name: Commit evidence images
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add experiments/apfs-encrypted-volume-data-recovery/images/*.png
+          if ! git diff --cached --quiet; then
+            git commit -m "Add APFS Encrypted original evidence images and cover"
+            git push
+          fi

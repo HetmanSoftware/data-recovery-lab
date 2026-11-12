@@ -39,6 +39,10 @@ data-recovery-lab/
 
 - [Recovering Deleted Files from BitLocker-Encrypted Drives: Windows 11, HDD, and USB](experiments/bitlocker-system-hdd-usb-data-recovery/README.md)
 
+### APFS / encrypted storage
+
+- [Recovering Files from APFS Encrypted Volumes: Deleted Files and Lost Partitions](experiments/apfs-encrypted-volume-data-recovery/README.md)
+
 ## Planned categories
 
 - Synology NAS

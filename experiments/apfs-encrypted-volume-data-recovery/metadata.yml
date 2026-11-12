@@ -1,0 +1,21 @@
+experiment:
+  slug: "apfs-encrypted-volume-data-recovery"
+  title: "Recovering Files from APFS Encrypted Volumes: Deleted Files and Lost Partitions"
+  category: "Encrypted storage / APFS"
+  date: null
+  status: "published"
+  hardware: "Removable encrypted USB storage; model not recorded"
+  operating_system: "Windows recovery application; exact OS build not recorded"
+  storage_topology: "APFS container and encrypted APFS volume"
+  filesystem: "APFS Encrypted"
+  failure_scenario: "Deleted files, unavailable APFS partition, former APFS partition after filesystem change"
+  source_document: "86Article_Відновлення данних з зашифрованих APFS дисків.docx"
+  source_article: "https://hetmanrecovery.com/recovery_news/how-to-recover-data-from-encrypted-apfs-disk/"
+  source_video_id: "UAoZEK6yuXc"
+  youtube_id: "bkXcrFO3Wi4"
+  cover: "apfs-encrypted-recovery-cover-en.png"
+  evidence_notes: "Original screenshots demonstrate UI states, file previews and partition detection. Exports and file integrity checks not recorded."
+  measurements:
+    exported_files: null
+    integrity_verified_files: null
+    note: "null means not recorded, not zero"
