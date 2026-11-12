@@ -1,0 +1,19 @@
+experiment:
+  slug: "ntfs-efs-encrypted-file-recovery"
+  title: "Recovering EFS-Encrypted Files on NTFS with a PFX Certificate"
+  category: "NTFS / encryption"
+  date: null  # demonstration date not recorded
+  publication_date: "2026-11-12"
+  status: "published"
+  filesystem: "NTFS"
+  encryption: "EFS"
+  os_key_export: "Windows (version not recorded)"
+  os_recovery_demo: "macOS (version not recorded)"
+  application: "Hetman Partition Recovery (version not recorded)"
+  youtube_id: "8-E0E0V7A_8"
+  cover: "efs-ntfs-file-recovery-cover-en.png"
+  images_source: "Original experimental screenshots absent from source DOCX; cover is conceptual"
+  detected_files: null
+  previewed_files: null
+  exported_files: null
+  integrity_verified_files: null

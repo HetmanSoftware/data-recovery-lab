@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Technical walkthrough of recovering EFS-encrypted NTFS files using the Windows EFS certificate and private key exported to a PFX file, with a macOS recovery demonstration.">
+<meta property="og:type" content="article"><meta property="og:title" content="Recovering EFS-Encrypted Files on NTFS with a PFX Certificate — Hetman Data Recovery Lab">
+<meta property="og:image" content="https://raw.githubusercontent.com/HetmanSoftware/data-recovery-lab/main/experiments/ntfs-efs-encrypted-file-recovery/images/efs-ntfs-file-recovery-cover-en.png"><link rel="canonical" href="https://hetmansoftware.github.io/data-recovery-lab/experiments/ntfs-efs-encrypted-file-recovery/">
+<title>Recovering EFS-Encrypted Files on NTFS | Hetman Data Recovery Lab</title><style>
+:root{--text:#14233b;--muted:#586a83;--accent:#176db8;--border:#dbe5ee;--surface:#f5f8fc}
+*{box-sizing:border-box}body{margin:0;background:#fff;color:var(--text);font:16px/1.7 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+header{background:var(--surface);border-bottom:1px solid var(--border)}nav{max-width:1020px;margin:auto;padding:18px 24px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}main{max-width:1020px;margin:0 auto;padding:36px 24px 80px}
+h1{font-size:clamp(30px,4.1vw,44px);line-height:1.15;letter-spacing:-.025em;margin:0 0 28px}h2{font-size:28px;line-height:1.24;margin:48px 0 20px;padding-bottom:8px;border-bottom:1px solid var(--border)}h3{font-size:21px}p,li{margin:12px 0}li{padding-left:2px}a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}img{max-width:100%;height:auto;border-radius:9px}p:has(img){margin:22px 0 10px}p:has(img)+p em{font-size:13px;color:var(--muted)}
+table{width:100%;border-collapse:collapse;margin:22px 0;font-size:15px}th,td{border:1px solid var(--border);padding:10px 12px;text-align:left;vertical-align:top}th{background:var(--surface)}.table-scroll{overflow-x:auto}pre{background:#122035;color:#e9f3ff;padding:16px 20px;border-radius:8px;overflow-x:auto}code{background:#eef4fa;border-radius:3px;padding:1px 4px;font-size:.92em}pre code{background:none;padding:0}
+.video-section{margin:24px 0 44px;padding:24px;background:var(--surface);border:1px solid var(--border);border-radius:12px}.video-section h2{border:0;margin:0 0 12px;padding:0;font-size:24px}.video-container{width:100%;aspect-ratio:16/9;background:#06182c;border-radius:10px;overflow:hidden}.video-container iframe{width:100%;height:100%;border:0;display:block}footer{text-align:center;border-top:1px solid var(--border);padding:28px;color:var(--muted);font-size:13px}
+</style></head>
+<body><header><nav><strong><a href="https://hetmansoftware.github.io/data-recovery-lab/">Hetman Data Recovery Lab</a></strong><a href="https://github.com/HetmanSoftware/data-recovery-lab/blob/main/experiments/ntfs-efs-encrypted-file-recovery/README.md">GitHub technical report</a></nav></header><main><article>
+<h1>Recovering EFS-Encrypted Files on NTFS with a PFX Certificate</h1>
+<p><img src="https://raw.githubusercontent.com/HetmanSoftware/data-recovery-lab/main/experiments/ntfs-efs-encrypted-file-recovery/images/efs-ntfs-file-recovery-cover-en.png" alt="Illustrated workflow showing an EFS-encrypted file, PFX certificate, and NTFS volume" /></p>
+<p><em>Cover illustration. This is explanatory artwork, not an experimental screenshot.</em></p>
+<p><strong>Lab:</strong> Hetman Software Data Recovery Lab<br />
+<strong>Case:</strong> <code>ntfs-efs-encrypted-file-recovery</code><br />
+<strong>Test date:</strong> Not recorded in the source script<br />
+<strong>Report status:</strong> Draft — pending source-image review and publication approval</p>
+<h2>Research question and scope</h2>
+<p>How can a data-recovery application locate files encrypted with Windows Encrypting File System (EFS) on an NTFS volume, and what additional information is required to preview and recover their plaintext contents after file loss or loss of access?</p>
+<p>The supplied demonstration script describes two complementary workflows: managing the EFS certificate and private key in <strong>Windows</strong>, and examining encrypted NTFS files with <strong>Hetman Partition Recovery on macOS</strong>. It also discusses the software's availability on Windows, Linux, and macOS. The material is a <strong>technical workflow demonstration</strong>, not a controlled multi-scenario benchmark. Hardware specifications, tested software versions, quantitative recovery measurements, and integrity checks were not recorded in the script.</p>
+<h2>Test environment and available evidence</h2>
+<table>
+<thead>
+<tr>
+  <th>Property</th>
+  <th>Recorded information</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>Source material</td>
+  <td>Hetman Software video script, “Відновлення файлів зашифрованих EFS на NTFS диску”</td>
+</tr>
+<tr>
+  <td>File system</td>
+  <td>NTFS</td>
+</tr>
+<tr>
+  <td>File encryption</td>
+  <td>Windows Encrypting File System (EFS)</td>
+</tr>
+<tr>
+  <td>Key material</td>
+  <td>Corresponding EFS certificate and private key, exported as password-protected PKCS #12 (<code>.pfx</code>)</td>
+</tr>
+<tr>
+  <td>Certificate-management environment</td>
+  <td>Windows; exact edition and version not recorded</td>
+</tr>
+<tr>
+  <td>Recovery demonstration environment</td>
+  <td>macOS; exact version not recorded</td>
+</tr>
+<tr>
+  <td>Recovery application</td>
+  <td>Hetman Partition Recovery; exact version used in the demonstration not recorded</td>
+</tr>
+<tr>
+  <td>Underlying device, capacity, sector size</td>
+  <td>Not recorded</td>
+</tr>
+<tr>
+  <td>File count, dataset, checksums</td>
+  <td>Not recorded</td>
+</tr>
+<tr>
+  <td>Disk-image acquisition and read-only controls</td>
+  <td>Not documented in the script</td>
+</tr>
+</tbody>
+</table>
+<p>The demonstration discusses deletion, formatting, partition removal, damaged NTFS metadata, and Windows reinstallation as potential causes of loss or inaccessibility. <strong>It does not establish that every one of these failure conditions was separately reproduced and tested.</strong></p>
+<h2>Technical background: EFS versus BitLocker</h2>
+<p>EFS encrypts <strong>individual files and directories on NTFS</strong>. The protected file remains part of the file-system namespace, but its content requires the appropriate EFS cryptographic key material. A Windows logon password on its own is not a substitute for the matching private key.</p>
+<table>
+<thead>
+<tr>
+  <th>Characteristic</th>
+  <th>Windows EFS</th>
+  <th>BitLocker</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>Protection scope</td>
+  <td>Individual NTFS files and folders</td>
+  <td>Entire volumes</td>
+</tr>
+<tr>
+  <td>Usual authorization material</td>
+  <td>EFS certificate and corresponding private key</td>
+  <td>Appropriate volume unlock/recovery credentials, such as a recovery key</td>
+</tr>
+<tr>
+  <td>Main recovery issue</td>
+  <td>Recover both the file's stored data and the means to decrypt it</td>
+  <td>Unlock the volume before normal file-system analysis</td>
+</tr>
+<tr>
+  <td>Simultaneous use</td>
+  <td>Can be layered on an NTFS volume protected with BitLocker</td>
+  <td>Can protect the volume containing EFS files</td>
+</tr>
+</tbody>
+</table>
+<p>EFS is not supported on FAT32 or exFAT. Conversely, an NTFS file's appearance in a recovery application's directory tree does not mean that its encrypted content can be decrypted. Microsoft's EFS documentation describes it as public-key cryptographic protection for files on NTFS volumes.</p>
+<h2>Certificate and private-key handling in Windows</h2>
+<p>The Windows portion of the demonstration uses the Certificate Manager for the current user:</p>
+<pre><code class="language-text">Win + R → certmgr.msc
+Current User → Personal → Certificates
+</code></pre>
+<p>Find the certificate associated with <strong>Encrypting File System</strong>. For an exportable certificate that includes the required private key, the script's sequence is:</p>
+<ol>
+<li>Right-click the certificate and select <strong>All Tasks → Export</strong>.</li>
+<li>In Certificate Export Wizard, select <strong>Yes, export the private key</strong>.</li>
+<li>Select <strong>Personal Information Exchange — PKCS #12 (<code>.PFX</code>)</strong>.</li>
+<li>Protect the export with a password and store the file on a separate trusted medium.</li>
+</ol>
+<p>A public-only certificate export will not provide the private key required for decryption. Export is possible only when the private key is available and its export policy permits it. Treat a <code>.pfx</code> file as highly sensitive: the file plus its password can enable access to EFS-protected content. Do not store the only backup on the affected disk.</p>
+<p>If the original Windows installation or user profile is no longer available, possession of encrypted files alone is insufficient. A usable key may still exist in another authorized backup or, in appropriately configured environments, in a recovery-agent setup; none of these alternatives is documented as part of this specific demonstration.</p>
+<h2>Data-loss scenarios and preservation</h2>
+<p>The script identifies the following situations in which EFS-protected content may become unavailable: accidental deletion, formatting, removal of a partition, NTFS damage, and reinstalling Windows without preserving the EFS key. These are <strong>covered as problem contexts</strong>, rather than verified independent test cases.</p>
+<p>For an actual incident, avoid operations that write to the affected source. Do not reinstall recovery software onto that disk, reformat it, or export recovered files to it. If the device is unstable, acquiring a sector-level image before repeated analysis can be appropriate; <strong>the supplied script does not record whether imaging was used in this demonstration</strong>. Flash storage with active TRIM or overwritten clusters can permanently eliminate the underlying data even when EFS key material survives.</p>
+<h2>Scanning EFS-protected NTFS files on macOS</h2>
+<p>The recovery portion of the source scenario uses Hetman Partition Recovery on macOS. The described sequence is:</p>
+<ol>
+<li>Connect a supported source device or open a supported disk image in the recovery application.</li>
+<li>Select the relevant NTFS storage source and start analysis. The script recommends beginning with <strong>Quick Analysis</strong> when the file system is structurally intact.</li>
+<li>Review discovered existing and deleted file entries. The interface can mark deleted entries and retain recognizable folder structure when metadata is available.</li>
+<li>Locate the EFS-encrypted entries. Without suitable decryption information, normal file preview is unavailable.</li>
+<li>Supply the certificate and its password through <strong>Add Decryption Data</strong>, either from the preview dialog or <strong>Tools → Add Decryption Data</strong>.</li>
+<li>Select the appropriate encryption type, choose the <code>.pfx</code> file and enter its export password.</li>
+<li>After the appropriate key material has been accepted, inspect the file preview. Select the desired entries, choose <strong>Recovery</strong>, and save the output to <strong>another physical storage device</strong>.</li>
+</ol>
+<p>The script describes availability of content preview after importing valid decryption credentials, but it does not provide an itemized test dataset or evidence of subsequent file-by-file integrity validation. The exact dialog options and names may differ between product versions.</p>
+<h2>Evidence and results</h2>
+<p>The distinction between detecting an EFS entry, decrypting its content for preview, exporting it, and verifying its integrity is essential.</p>
+<table>
+<thead>
+<tr>
+  <th>Stage</th>
+  <th>Observation supported by the script</th>
+  <th>Quantitative evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>NTFS analysis and enumeration</td>
+  <td>Existing and deleted file entries are displayed, potentially including EFS-encrypted entries</td>
+  <td>Not recorded</td>
+</tr>
+<tr>
+  <td>Preview without EFS key</td>
+  <td>Preview of protected content is unavailable until the appropriate decryption data is supplied</td>
+  <td>Not recorded</td>
+</tr>
+<tr>
+  <td>Adding decryption data</td>
+  <td>The script describes supplying a key file, encryption type, and password</td>
+  <td>Not recorded</td>
+</tr>
+<tr>
+  <td>Preview with the correct key</td>
+  <td>Preview becomes available as described in the walkthrough</td>
+  <td>No files or hashes documented</td>
+</tr>
+<tr>
+  <td>Export / recovery to another device</td>
+  <td>The script instructs the operator to recover selected files to separate storage</td>
+  <td>Export count not recorded</td>
+</tr>
+<tr>
+  <td>File integrity verification</td>
+  <td>No hash comparison, application-open test, or equivalent is documented</td>
+  <td>Not recorded</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Interpretation:</strong> This material supports a workflow demonstration and documentation of required key material. It is <strong>not evidence that all loss scenarios were recovered, that a particular number of files was exported, or that exported files passed independent integrity verification</strong>.</p>
+<h2>Limitations and failure conditions</h2>
+<ul>
+<li>Without the correct EFS private key (or another authorized decryption mechanism), a file-recovery application cannot defeat EFS encryption simply by finding encrypted file bytes.</li>
+<li>A Windows account password is not itself an EFS decryption key. Possession of a <code>.pfx</code> backup without its correct password may also be insufficient.</li>
+<li>Deleted data can be overwritten, trimmed, partially fragmented, or unrecoverable because NTFS metadata has been lost.</li>
+<li>The supplied script does not identify the tested drive, operating-system versions, software build, EFS algorithm, exact source damage, or measured successful exports.</li>
+<li>The original DOCX contains no screenshots. The cover is a separate conceptual illustration; experimental screenshots should be extracted and checked from the demonstration video or original laboratory files before publication.</li>
+</ul>
+<h2>Conclusion</h2>
+<p>EFS file recovery has two separate prerequisites: locating intact recoverable NTFS file content and obtaining valid cryptographic key material for that content. The described Windows workflow exports a corresponding EFS certificate and private key as a protected <code>.pfx</code> file. The macOS workflow uses this material in Hetman Partition Recovery to enable the preview of encrypted files and provides a route for exporting selected data to a different device.</p>
+<p>The supplied source documents the workflow but does not quantify its recovery success rate. Further experimental claims would require source screenshots, recorded recovery results, and independent validation of restored files.</p>
+<h2>Video walkthrough</h2>
+<p><a href="https://www.youtube.com/watch?v=8-E0E0V7A_8">How to Recover EFS-Encrypted Files from an NTFS Drive | Certificate and PFX Key</a></p>
+<p>The GitHub Pages HTML version is configured to embed the demonstration video.</p>
+<h2>References and related resources</h2>
+<ul>
+<li><a href="https://learn.microsoft.com/en-us/windows/win32/fileio/file-encryption">Microsoft: File Encryption / EFS</a></li>
+<li><a href="https://support.microsoft.com/en-us/windows/security/encryption/how-to-encrypt-a-file-or-folder">Microsoft: How to encrypt a file or folder in Windows</a></li>
+<li><a href="https://hetmanrecovery.com/version_history.htm">Hetman Software: Version history — EFS/PFX/P12 support</a></li>
+<li><a href="https://github.com/HetmanSoftware/data-recovery-lab">Hetman Software Data Recovery Lab</a></li>
+</ul>
+
+<section class="video-section" aria-label="Video demonstration">
+  <h2>Video demonstration</h2><p>See the EFS certificate-export and macOS recovery workflow.</p>
+  <div class="video-container"><iframe src="https://www.youtube-nocookie.com/embed/8-E0E0V7A_8" title="Recovering EFS-encrypted files on NTFS — demonstration" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
+</section>
+</article></main><footer>Hetman Software Data Recovery Lab · <a href="https://hetmanrecovery.com/">hetmanrecovery.com</a></footer></body></html>

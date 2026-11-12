@@ -31,6 +31,10 @@ data-recovery-lab/
 
 - [VeraCrypt file containers, hidden volumes, and deleted encrypted partitions](experiments/veracrypt-containers-hidden-volumes-deleted-partitions/README.md)
 
+### NTFS / EFS encrypted files
+
+- [Recovering EFS-encrypted files on NTFS with a PFX certificate](experiments/ntfs-efs-encrypted-file-recovery/README.md)
+
 ## Planned categories
 
 - Synology NAS
