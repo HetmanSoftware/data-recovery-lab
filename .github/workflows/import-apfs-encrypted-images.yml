@@ -11,44 +11,79 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Install dependencies
-        run: python -m pip install --disable-pip-version-check requests pillow cairosvg
-      - name: Download original publication screenshots and render cover
+      - run: python -m pip install requests pillow cairosvg beautifulsoup4
+      - name: Fetch screenshots from the original published HTML
         run: |
           python - <<'PYCODE'
-          import io, requests
+          import io,urllib.parse,re,requests
           from pathlib import Path
           from PIL import Image
+          from bs4 import BeautifulSoup
           import cairosvg
-          names = ["apfs-encrypted-format-in-disk-utility.png","hetman-partition-recovery-apfs-encrypted-usb.png","hetman-partition-recovery-apfs-encrypted-volume-status.png","hetman-partition-recovery-unlock-apfs-encrypted-volume.png","hetman-partition-recovery-detected-apfs-encrypted-disk.png","hetman-partition-recovery-apfs-encrypted-recovery-results.png","hetman-partition-recovery-full-analysis-apfs.png","hetman-partition-recovery-unlock-apfs-with-password.png","hetman-partition-recovery-find-partitions-on-disk.png","hetman-partition-recovery-find-lost-apfs-partitions.png","hetman-partition-recovery-apfs-partition-search-range.png","hetman-partition-recovery-detected-apfs-partition-after-search.png","hetman-partition-recovery-found-encrypted-apfs-volume.png","hetman-partition-recovery-apfs-files-preview.png"]
-          dst=Path('experiments/apfs-encrypted-volume-data-recovery/images')
-          dst.mkdir(parents=True,exist_ok=True)
-          session=requests.Session(); session.headers.update({'User-Agent':'Mozilla/5.0 (compatible; HetmanDataRecoveryLab/1.0)'})
-          for name in names:
-              data=None;last=None
-              for prefix in ['https://hetmanrecovery.com/uk/pic/blog/a46/','https://hetmanrecovery.com/pic/blog/a46/']:
-                  url=prefix+name
-                  try:
-                      r=session.get(url,timeout=45,headers={'Referer':'https://hetmanrecovery.com/uk/recovery_news/how-to-recover-data-from-encrypted-apfs-disk/'});r.raise_for_status()
-                      pic=Image.open(io.BytesIO(r.content));pic.verify()
-                      pic=Image.open(io.BytesIO(r.content))
-                      if pic.width<600 or pic.height<200:raise ValueError('Unexpected dimensions '+str(pic.size))
-                      if pic.format!='PNG':raise ValueError('Expected PNG evidence, got '+str(pic.format))
-                      data=r.content;print(name, pic.size, url);break
-                  except Exception as exc:last=exc
-              if data is None:raise RuntimeError('Cannot download original '+name+': '+str(last))
-              (dst/name).write_bytes(data)
-          assert len(list(dst.glob('*.png')))==len(names)
-          cairosvg.svg2png(url=str(dst/'apfs-encrypted-recovery-cover-en.svg'),write_to=str(dst/'apfs-encrypted-recovery-cover-en.png'),output_width=1200,output_height=675)
-          assert Image.open(dst/'apfs-encrypted-recovery-cover-en.png').size==(1200,675)
-          print('Imported',len(names),'original screenshots and rendered English cover')
+          source='https://hetmanrecovery.com/recovery_news/how-to-recover-data-from-encrypted-apfs-disk'
+          sess=requests.Session()
+          sess.headers.update({'User-Agent':'Googlebot'})
+          html=sess.get(source,timeout=30)
+          print('Article',html.status_code,html.url, len(html.content))
+          html.raise_for_status()
+          doc=BeautifulSoup(html.text,'html.parser')
+          base='https://hetmanrecovery.com'
+          out=Path('experiments/apfs-encrypted-volume-data-recovery/images');out.mkdir(parents=True,exist_ok=True)
+          targets=[
+           ('apfs-encrypted-format-in-disk-utility.png','APFS Encrypted file system in Disk Utility'),
+           ('hetman-partition-recovery-apfs-encrypted-usb.png','Hetman Partition Recovery: APFS Encrypted USB'),
+           ('hetman-partition-recovery-apfs-encrypted-volume-status.png','Hetman Partition Recovery: APFS Encrypted USB status'),
+           ('hetman-partition-recovery-unlock-apfs-encrypted-volume.png','Hetman Partition Recovery: unlocking APFS Encrypted volume'),
+           ('hetman-partition-recovery-detected-apfs-encrypted-disk.png','Hetman Partition Recovery: detected APFS Encrypted disk'),
+           ('hetman-partition-recovery-apfs-encrypted-recovery-results.png','Hetman Partition Recovery: APFS Encrypted disk analysis results'),
+           ('hetman-partition-recovery-full-analysis-apfs.png','Hetman Partition Recovery: full analysis of APFS Encrypted disk'),
+           ('hetman-partition-recovery-unlock-apfs-with-password.png','Hetman Partition Recovery: unlocking APFS Encrypted disk with password'),
+           ('hetman-partition-recovery-find-partitions-on-disk.png','Hetman Partition Recovery: search for partitions on disk'),
+           ('hetman-partition-recovery-find-lost-apfs-partitions.png','Hetman Partition Recovery: partition search settings on disk'),
+           ('hetman-partition-recovery-apfs-partition-search-range.png','Hetman Partition Recovery: partition search range on disk'),
+           ('hetman-partition-recovery-detected-apfs-partition-after-search.png','Hetman Partition Recovery: detected partition after search'),
+           ('hetman-partition-recovery-found-encrypted-apfs-volume.png','Hetman Partition Recovery: found encrypted partition'),
+           ('hetman-partition-recovery-apfs-files-preview.png','Hetman Partition Recovery: available files of encrypted partition')
+          ]
+          images=[]
+          for tag in doc.find_all('img'):
+            alt=' '.join((tag.get('alt') or '').split())
+            candidates=[]
+            for key in ['data-src','data-original','data-lazy-src','src']:
+              v=tag.get(key)
+              if v and not v.startswith('data:'):candidates.append(urllib.parse.urljoin(source,v))
+            if tag.get('srcset'):
+              candidates.extend([urllib.parse.urljoin(source,part.strip().split()[0]) for part in tag['srcset'].split(',') if part.strip()])
+            images.append((alt,list(dict.fromkeys(candidates))))
+          print('Relevant page image tags:',[(a,ls[:2]) for a,ls in images if 'APFS' in a or 'encrypted' in a.lower()])
+          for name,needle in targets:
+            matches=[(a,c) for a,c in images if a.lower()==needle.lower()]
+            if not matches:
+              print('MISSING',name,needle)
+              raise RuntimeError('Matching original screenshot alt not found')
+            last=None
+            for alt,candidates in matches:
+              for url in candidates:
+                if not urllib.parse.urlparse(url).hostname.endswith('hetmanrecovery.com'):continue
+                try:
+                  r=sess.get(url,timeout=25,headers={'Referer':source});r.raise_for_status()
+                  img=Image.open(io.BytesIO(r.content));img.load()
+                  if img.width<600 or img.height<200: raise ValueError('Small image '+str(img.size))
+                  img.convert('RGB').save(out/name,'PNG',optimize=True)
+                  print('Imported',name,img.size,url)
+                  last=None;break
+                except Exception as e:last=e;print('Candidate failed:',url,repr(e))
+              if last is None:break
+            if last is not None:raise RuntimeError('Cannot retrieve '+name+': '+str(last))
+          cairosvg.svg2png(url=str(out/'apfs-encrypted-recovery-cover-en.svg'),write_to=str(out/'apfs-encrypted-recovery-cover-en.png'),output_width=1200,output_height=675)
+          print('Total original screenshots:',len(targets))
           PYCODE
-      - name: Commit evidence images
+      - name: Commit images
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add experiments/apfs-encrypted-volume-data-recovery/images/*.png
           if ! git diff --cached --quiet; then
-            git commit -m "Add APFS Encrypted original evidence images and cover"
+            git commit -m "Add original APFS screenshots and cover"
             git push
           fi
